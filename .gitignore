@@ -25,6 +25,8 @@ bin/
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
+src/main/resources/*.properties
+/src/main/java/com/plazti/platzimarker/persistence/entity/
 
 ### NetBeans ###
 /nbproject/private/
