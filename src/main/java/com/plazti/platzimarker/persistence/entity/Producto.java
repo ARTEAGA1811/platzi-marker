@@ -2,6 +2,7 @@ package com.plazti.platzimarker.persistence.entity;
 
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name="productos")
@@ -9,8 +10,8 @@ public class Producto {
 
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
-    @Column(name="id")
-    private int id;
+    @Column(name="id_producto")
+    private Integer idProducto;
 
     //Solo se agrega el atributo de columna cuando usamos diferentes nombres con la base de datos
     private String nombre;
@@ -29,14 +30,22 @@ public class Producto {
 
     private Boolean estado;
 
+    @ManyToOne
+    @JoinColumn(name="id_categoria", insertable=false, updatable=false)
+    private Categoria categoria;
+
+
+//    @OneToMany(mappedBy="compra")
+//    private List<ComprasProducto> compras;
+
 
     //Getters and Setters
-    public int getId() {
-        return id;
+    public Integer getIdProducto() {
+        return idProducto;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setIdProducto(Integer idProducto) {
+        this.idProducto = idProducto;
     }
 
     public String getNombre() {
@@ -86,4 +95,14 @@ public class Producto {
     public void setEstado(Boolean estado) {
         this.estado = estado;
     }
+
+    public Categoria getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(Categoria categoria) {
+        this.categoria = categoria;
+    }
+
+
 }
