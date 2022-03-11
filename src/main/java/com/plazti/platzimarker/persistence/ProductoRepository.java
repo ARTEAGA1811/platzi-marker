@@ -1,7 +1,11 @@
 package com.plazti.platzimarker.persistence;
 
+import com.plazti.platzimarker.domain.DoProduct;
+import com.plazti.platzimarker.domain.repository.DoProductRepository;
 import com.plazti.platzimarker.persistence.crud.ProductoCrudRepository;
 import com.plazti.platzimarker.persistence.entity.Producto;
+import com.plazti.platzimarker.persistence.mapper.ProductMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -9,33 +13,51 @@ import java.util.Optional;
 
 //Con este @Repository se indica que esta clase se encarga de interactuar con la base de datos.
 @Repository
-public class ProductoRepository {
+public class ProductoRepository implements DoProductRepository {
+    //INYECCION DE DEPENDENCIAS
+    //estos atributos no estan inicializados, por lo que estan en null
+    //Esto nos traera problemas. Por eso se usa @Autowired para inicializarlos. esto es parte de spring.
+    //Cuando se usa el @Autowired, hay que estar seguros que este atributo que vamos a inyectar es un componente de spring.
 
-    private ProductoCrudRepository productoCrudRepository;
+    @Autowired
+    private ProductoCrudRepository productoCrudRepository; //este esta aun en la persistencia
+    @Autowired
+    private ProductMapper mapper; //mapeador
 
-    public List<Producto> getAll(){
-        return (List<Producto>) productoCrudRepository.findAll();
+    @Override
+    public List<DoProduct> getAll(){
+        List<Producto> productos = (List<Producto>) productoCrudRepository.findAll();
+        return mapper.toDoProductList(productos);
     }
 
-    public List<Producto> getByCategoria( int idCategoria ){
-        return productoCrudRepository.findByIdCategoriaOrderByNombreAsc(idCategoria);
+    @Override
+    public Optional<List<DoProduct>> getByCategory(int categoryId) {
+        List<Producto> productos = productoCrudRepository.findByIdCategoriaOrderByNombreAsc(categoryId);
+        return Optional.of(mapper.toDoProductList(productos));
     }
 
-    public Optional<List<Producto>> getEscasos(int cantidad){
-        return productoCrudRepository.findByCantidadStockLessThanAndEstado(cantidad, true);
+    @Override
+    public Optional<List<DoProduct>> getScarseProducts(int quantity) {
+        Optional<List<Producto>> productos = productoCrudRepository.findByCantidadStockLessThanAndEstado(quantity, true);
+        //Como no tengo que me mapee los prodouctos, hago lo siguiente
+        return productos.map(prods -> mapper.toDoProductList(prods));
     }
 
-
-    public Optional <Producto> getProductoById(int idProducto){
-        return productoCrudRepository.findById(idProducto);
+    @Override
+    public Optional<DoProduct> getProductById(int productId) {
+        //El findById ya retorna un Optional
+        return productoCrudRepository.findById(productId).map(prod -> mapper.toDoProduct(prod));
     }
 
-    public Producto save(Producto producto){
-        return productoCrudRepository.save(producto);
+    @Override
+    public DoProduct save(DoProduct product) {
+        Producto miProducto = mapper.toProducto(product);
+        return mapper.toDoProduct(productoCrudRepository.save(miProducto));
     }
 
-    public void deleteById(int idProducto){
-        productoCrudRepository.deleteById(idProducto);
+    @Override
+    public void deleteById(int productId){
+        productoCrudRepository.deleteById(productId);
     }
 
 }

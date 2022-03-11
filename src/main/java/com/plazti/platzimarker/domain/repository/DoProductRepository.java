@@ -8,7 +8,7 @@ import java.util.Optional;
 public interface DoProductRepository {
 
     List<DoProduct> getAll();
-    Optional<DoProduct> getByCategory(int categoryId);
+    Optional<List<DoProduct>> getByCategory(int categoryId);
     Optional<List<DoProduct>> getScarseProducts(int quantity);
     Optional<DoProduct> getProductById(int productId);
     DoProduct save(DoProduct product);
