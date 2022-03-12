@@ -40,13 +40,15 @@ public class ProductoRepository implements DoProductRepository {
     public Optional<List<DoProduct>> getScarseProducts(int quantity) {
         Optional<List<Producto>> productos = productoCrudRepository.findByCantidadStockLessThanAndEstado(quantity, true);
         //Como no tengo que me mapee los prodouctos, hago lo siguiente
-        return productos.map(prods -> mapper.toDoProductList(prods));
+        return productos
+                .map(prods -> mapper.toDoProductList(prods));
     }
 
     @Override
     public Optional<DoProduct> getProductById(int productId) {
         //El findById ya retorna un Optional
-        return productoCrudRepository.findById(productId).map(prod -> mapper.toDoProduct(prod));
+        return productoCrudRepository.findById(productId)
+                .map(prod -> mapper.toDoProduct(prod));
     }
 
     @Override

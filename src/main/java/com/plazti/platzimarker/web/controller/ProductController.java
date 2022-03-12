@@ -3,9 +3,10 @@ package com.plazti.platzimarker.web.controller;
 import com.plazti.platzimarker.domain.DoProduct;
 import com.plazti.platzimarker.domain.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.websocket.server.PathParam;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,31 +18,54 @@ public class ProductController {
     private ProductService productService;
 
     @GetMapping("/all")
-    public List<DoProduct> getAll() {
-        return productService.getAll();
+    public ResponseEntity<List<DoProduct>> getAll() {
+       //return productService.getAll();
+        return new ResponseEntity<>(productService.getAll(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public Optional<DoProduct> getProductById(@PathVariable("id") int productId){
-        System.out.println("productId: " + productId);
-        return productService.getProductById(productId);
+    public ResponseEntity<DoProduct> getProductById(@PathVariable("id") int productId){
+        //El product SErvice me retorna un optional, taca hacer un mapeo.
+        return productService.getProductById(productId)
+                .map(prod -> new ResponseEntity<>(prod, HttpStatus.OK))
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @GetMapping("/category/{categoryId}")
-    public Optional<List<DoProduct>> getByCategory(@PathVariable("categoryId") int categoryId){
-        return productService.getByCategory(categoryId);
+    public ResponseEntity<List<DoProduct>> getByCategory(@PathVariable("categoryId") int categoryId){
+        //Me devuelve un optional con la lista de productos.
+//        return productService.getByCategory(categoryId)
+//                .map(prodList -> new ResponseEntity<>(prodList, HttpStatus.OK))
+//                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+
+        //Aqui me devuelce ok a pesar de que no encuentra nada.
+        //Le resuelvo asi:
+        Optional<List<DoProduct>> misProductos = productService.getByCategory(categoryId);
+        if(misProductos.isPresent() && !misProductos.get().isEmpty()){
+            return new ResponseEntity<>(misProductos.get(), HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+
     }
 
 
     @PostMapping("/save")
-    public DoProduct save(@RequestBody DoProduct product){
-        return productService.save(product);
+    public ResponseEntity<DoProduct> save(@RequestBody DoProduct product){
+        return new ResponseEntity<>(productService.save(product), HttpStatus.CREATED);
+
     }
 
     //Aqui le cambio a boolean, en el DoProductRepository esta como void
+    //Ahora se cambia solo a un ResponseEntity
     @DeleteMapping("/delete/{id}")
-    public boolean deleteById(@PathVariable("id") int productId){
-        return productService.deleteById(productId);
+    public ResponseEntity deleteById(@PathVariable("id") int productId){
+        return new ResponseEntity<>(
+                productService.deleteById(productId)
+                ? HttpStatus.OK
+                : HttpStatus.NOT_FOUND
+        );
     }
 
 }
