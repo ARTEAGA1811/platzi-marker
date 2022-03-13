@@ -2,6 +2,7 @@ package com.plazti.platzimarker.web.controller;
 
 import com.plazti.platzimarker.domain.DoProduct;
 import com.plazti.platzimarker.domain.service.ProductService;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,13 +19,19 @@ public class ProductController {
     private ProductService productService;
 
     @GetMapping("/all")
+    @ApiOperation("Get all supermarket products")
     public ResponseEntity<List<DoProduct>> getAll() {
        //return productService.getAll();
         return new ResponseEntity<>(productService.getAll(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DoProduct> getProductById(@PathVariable("id") int productId){
+    @ApiOperation("Search a product by id")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Product found"),
+            @ApiResponse(code = 404, message = "Product not found")
+    })
+    public ResponseEntity<DoProduct> getProductById(@ApiParam(value = "The id of the product", required = true, example = "7") @PathVariable("id") int productId){
         //El product SErvice me retorna un optional, taca hacer un mapeo.
         return productService.getProductById(productId)
                 .map(prod -> new ResponseEntity<>(prod, HttpStatus.OK))
