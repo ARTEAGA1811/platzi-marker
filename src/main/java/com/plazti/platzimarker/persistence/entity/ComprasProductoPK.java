@@ -28,4 +28,6 @@ public class ComprasProductoPK implements java.io.Serializable {
     public void setIdProducto(Integer idProducto) {
         this.idProducto = idProducto;
     }
+
+
 }
