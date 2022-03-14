@@ -1,5 +1,5 @@
 # Platzi Market
-### _Creación de un Sistema de productos y compras mediante el uso del Framework de Java, Spring._
+### _API Rest para un Sistema de productos y compras mediante el uso del Framework de Java, Spring._
 
 ## Tech
 - Java Spring,
